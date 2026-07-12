@@ -89,3 +89,24 @@ CREATE TABLE PRECEPTOR (
         
     CONSTRAINT CK_PRECEPTOR_DATAS CHECK (dt_fim IS NULL OR dt_fim >= dt_inicio)
 );
+
+
+
+-- TABELA UNIDADE:
+CREATE TABLE UNIDADE(
+    id_unidade INT,
+    nome VARCHAR(14)
+
+    CONSTRAINT pk_unidade PRIMARY KEY (id_unidade),
+    CONSTRAINT  ck_nome CHECK (nome IN ('Enfermaria', 'UTI', 'PRONTO-SOCORRO', 'AMBULATORIO'))
+);
+
+-- TABELA PROCEDIMENTO:
+CREATE TABLE PROCEDIMENTO(
+    id_procedimento INT,
+    codigo VARCHAR(20) NOT NULL UNIQUE,
+    nome VARCHAR(100) NOT NULL,
+    tempo_medio_execucao INT,
+
+    CONSTRAINT pk_procedimento PRIMARY KEY (id_procedimento)
+);
