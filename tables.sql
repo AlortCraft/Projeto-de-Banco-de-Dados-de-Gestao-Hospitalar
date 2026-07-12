@@ -95,7 +95,7 @@ CREATE TABLE PRECEPTOR (
 -- TABELA UNIDADE:
 CREATE TABLE UNIDADE(
     id_unidade INT,
-    nome VARCHAR(14)
+    nome VARCHAR(14), -- Faltava uma vírgula.
 
     CONSTRAINT pk_unidade PRIMARY KEY (id_unidade),
     CONSTRAINT  ck_nome CHECK (nome IN ('Enfermaria', 'UTI', 'PRONTO-SOCORRO', 'AMBULATORIO'))
@@ -109,4 +109,131 @@ CREATE TABLE PROCEDIMENTO(
     tempo_medio_execucao INT,
 
     CONSTRAINT pk_procedimento PRIMARY KEY (id_procedimento)
+);
+
+
+
+-- TABELAS RESULTANTES DA NORMALIZAÇÃO (TRATAMENTO DOS MULTIVALORADOS NA 1FN)
+
+-- NORMALIZAÇÃO DE PESSOA: TELEFONE
+-- O atributo "telefone" era multivalorado no MER (uma pessoa pode ter vários números),
+-- o que violava a 1FN. Cada número vira uma linha própria.
+CREATE TABLE TELEFONE (
+    id_pessoa INT,
+    num_telefone VARCHAR(20),
+    CONSTRAINT PK_TELEFONE PRIMARY KEY (id_pessoa, num_telefone),
+    CONSTRAINT FK_TELEFONE_PESSOA FOREIGN KEY (id_pessoa)
+        REFERENCES PESSOA(id_pessoa) ON DELETE CASCADE
+);
+
+-- NORMALIZAÇÃO DE PACIENTE (parte 1): ALERGIA
+-- Catálogo de alergias. O atributo "alergias" era multivalorado em PACIENTE e violava a 1FN.
+CREATE TABLE ALERGIA (
+    id_alergia SERIAL,
+    nome_alergia VARCHAR(100) NOT NULL,
+
+    CONSTRAINT PK_ALERGIA PRIMARY KEY (id_alergia),
+    CONSTRAINT UN_ALERGIA_NOME UNIQUE (nome_alergia)
+);
+
+-- NORMALIZAÇÃO DE PACIENTE (parte 2): ALERGIA_PACIENTE
+-- Tabela de junção: a relação entre PACIENTE e ALERGIA é N:N
+CREATE TABLE ALERGIA_PACIENTE (
+    id_pessoa INT,
+    id_alergia INT,
+
+    CONSTRAINT PK_ALERGIA_PACIENTE PRIMARY KEY (id_pessoa, id_alergia),
+    CONSTRAINT FK_ALERGIA_PACIENTE_PACIENTE FOREIGN KEY (id_pessoa)
+        REFERENCES PACIENTE(id_pessoa) ON DELETE CASCADE,
+    CONSTRAINT FK_ALERGIA_PACIENTE_ALERGIA FOREIGN KEY (id_alergia)
+        REFERENCES ALERGIA(id_alergia) ON DELETE CASCADE
+);
+
+
+
+-- TABELAS DE OPERAÇÃO E RELACIONAMENTOS (COM FKs COMPOSTAS DO HISTÓRICO)
+
+-- TABELA ATENDIMENTO
+-- Relações N:1 com PACIENTE, RESIDENTE e PRECEPTOR: um atendimento tem exatamente
+-- um paciente, um residente e um preceptor, mas cada um deles pode ter vários atendimentos.
+CREATE TABLE ATENDIMENTO (
+    id_atendimento SERIAL,
+    data_hora TIMESTAMP NOT NULL,
+    duracao_minutos INT NOT NULL,
+    id_paciente INT NOT NULL,
+
+    id_residente INT NOT NULL,
+    dt_inicio_residente TIMESTAMP NOT NULL,
+
+    id_preceptor INT NOT NULL,
+    dt_inicio_preceptor TIMESTAMP NOT NULL,
+
+    CONSTRAINT PK_ATENDIMENTO PRIMARY KEY (id_atendimento),
+    CONSTRAINT FK_ATENDIMENTO_PACIENTE FOREIGN KEY (id_paciente)
+        REFERENCES PACIENTE(id_pessoa) ON DELETE RESTRICT,
+
+    CONSTRAINT FK_ATENDIMENTO_RESIDENTE FOREIGN KEY (id_residente, dt_inicio_residente)
+        REFERENCES RESIDENTE(id_pessoa, dt_inicio) ON DELETE RESTRICT,
+    CONSTRAINT FK_ATENDIMENTO_PRECEPTOR FOREIGN KEY (id_preceptor, dt_inicio_preceptor)
+        REFERENCES PRECEPTOR(id_pessoa, dt_inicio) ON DELETE RESTRICT,
+
+    CONSTRAINT CK_ATENDIMENTO_DURACAO CHECK (duracao_minutos > 0),
+
+    -- Um profissional não pode supervisionar a si mesmo
+    CONSTRAINT CK_ATENDIMENTO_PAPEIS CHECK (id_residente <> id_preceptor)
+);
+
+-- TABELA ATENDIMENTO_PROCEDIMENTO (o "procedimento realizado")
+-- A relação entre ATENDIMENTO e PROCEDIMENTO é N:N: um atendimento pode ter vários
+-- procedimentos e um procedimento pode ocorrer em vários atendimentos. Por isso cria-se
+-- esta tabela com os dois identificadores + os atributos próprios da relação.
+CREATE TABLE ATENDIMENTO_PROCEDIMENTO (
+    id_atendimento INT,
+    id_procedimento INT,
+    qtd_executada INT NOT NULL DEFAULT 1,
+    tempo_real_gasto INT NOT NULL,
+    observacao_intercorrencias VARCHAR(255),
+
+    -- Flag de faturamento: um procedimento realizado só pode ser removido enquanto não faturado
+    is_faturado BOOLEAN NOT NULL DEFAULT FALSE,
+
+    CONSTRAINT PK_ATENDIMENTO_PROCEDIMENTO PRIMARY KEY (id_atendimento, id_procedimento),
+    CONSTRAINT FK_ATEND_PROC_ATENDIMENTO FOREIGN KEY (id_atendimento)
+        REFERENCES ATENDIMENTO(id_atendimento) ON DELETE CASCADE,
+    CONSTRAINT FK_ATEND_PROC_PROCEDIMENTO FOREIGN KEY (id_procedimento)
+        REFERENCES PROCEDIMENTO(id_procedimento) ON DELETE RESTRICT,
+
+    CONSTRAINT CK_ATEND_PROC_QTD CHECK (qtd_executada > 0),
+    CONSTRAINT CK_ATEND_PROC_TEMPO CHECK (tempo_real_gasto >= 0)
+);
+
+-- TABELA ESCALA_PLANTAO
+-- Define o plantão: uma unidade, um dia da semana, um turno, um residente e o preceptor
+-- que o supervisiona. As FKs de RESIDENTE e PRECEPTOR também são compostas (histórico).
+CREATE TABLE ESCALA_PLANTAO (
+    id_escala SERIAL,
+    dia_semana VARCHAR(8) NOT NULL,
+    turno VARCHAR(6) NOT NULL,
+    id_unidade INT NOT NULL,
+
+    id_residente INT NOT NULL,
+    dt_inicio_residente TIMESTAMP NOT NULL,
+    id_preceptor INT NOT NULL,
+    dt_inicio_preceptor TIMESTAMP NOT NULL,
+
+    CONSTRAINT PK_ESCALA_PLANTAO PRIMARY KEY (id_escala),
+    CONSTRAINT FK_ESCALA_UNIDADE FOREIGN KEY (id_unidade)
+        REFERENCES UNIDADE(id_unidade) ON DELETE RESTRICT,
+    CONSTRAINT FK_ESCALA_RESIDENTE FOREIGN KEY (id_residente, dt_inicio_residente)
+        REFERENCES RESIDENTE(id_pessoa, dt_inicio) ON DELETE RESTRICT,
+    CONSTRAINT FK_ESCALA_PRECEPTOR FOREIGN KEY (id_preceptor, dt_inicio_preceptor)
+        REFERENCES PRECEPTOR(id_pessoa, dt_inicio) ON DELETE RESTRICT,
+
+    -- Não pode haver o mesmo residente no mesmo local/dia/turno
+    -- com dois preceptores distintos. O UNIQUE usa id_residente (a pessoa), e não o período,
+    -- para não enfraquecer a restrição.
+    CONSTRAINT UN_ESCALA_RESIDENTE UNIQUE (id_unidade, dia_semana, turno, id_residente),
+    CONSTRAINT CK_ESCALA_DIA CHECK (dia_semana IN ('SEGUNDA', 'TERCA', 'QUARTA', 'QUINTA', 'SEXTA', 'SABADO', 'DOMINGO')),
+    CONSTRAINT CK_ESCALA_TURNO CHECK (turno IN ('MANHA', 'TARDE', 'NOITE')),
+    CONSTRAINT CK_ESCALA_PAPEIS CHECK (id_residente <> id_preceptor)
 );
