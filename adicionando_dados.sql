@@ -4,10 +4,10 @@
 INSERT INTO PESSOA (id_pessoa, nome, cpf, dt_nascimento, is_flamengo, is_paciente, is_profissional)
 VALUES
 (1, 'João Silva', '11111111111', '1990-05-14', TRUE, TRUE, FALSE),
-(2, 'Maria Oliveira', '22222222222', '1985-10-20', FALSE, TRUE, FALSE),
-(3, 'Carlos Santos', '33333333333', '2000-02-28', FALSE, TRUE, FALSE),
-(4, 'Ana Costa', '44444444444', '1978-12-05', TRUE, TRUE, FALSE),
-(5, 'Pedro Souza', '55555555555', '2010-07-15', FALSE, TRUE, FALSE),
+(2, 'Gabriel Barbosa (Gabigol)', '22222222222', '1996-08-30', TRUE, TRUE, FALSE),
+(3, 'Arthur Antunes Coimbra (Zico)', '33333333333', '1953-03-03', TRUE, TRUE, FALSE),
+(4, 'Monkey D. Luffy', '44444444444', '1997-05-05', TRUE, TRUE, FALSE),
+(5, 'Light Yagami', '55555555555', '1986-02-28', FALSE, TRUE, FALSE),
 
 (6, 'Lucas Lima', '66666666666', '1996-03-10', TRUE, FALSE, TRUE),
 (7, 'Fernanda Alves', '77777777777', '1995-08-22', TRUE, FALSE, TRUE),
@@ -30,10 +30,10 @@ VALUES
 INSERT INTO PACIENTE (id_pessoa, num_convenio, grupo_sanguineo, is_paciente_flag, is_profissional_flag)
 VALUES
 (1, 'UNIMED-001', 'O+', TRUE, FALSE),
-(2, 'SULAM-002', 'A-', TRUE, FALSE),
-(3, 'BRAD-003', 'AB+', TRUE, FALSE),
-(4, 'CASSI-004', 'B+', TRUE, FALSE),
-(5, 'AMIL-005', 'O-', TRUE, FALSE),
+(2, 'FLA-2019', 'O+', TRUE, FALSE),
+(3, 'FLA-1981', 'O-', TRUE, FALSE),
+(4, 'MUGIWARA-001', 'B+', TRUE, FALSE),
+(5, 'KIRA-040', 'AB+', TRUE, FALSE),
 
 (16, 'UNIMED-016', 'A+', TRUE, TRUE),
 (17, 'AMIL-017', 'O+', TRUE, TRUE),
@@ -85,3 +85,73 @@ VALUES
 
 (16, '2015-02-01 00:00:00', NULL, 'MESTRADO'),
 (18, '2021-03-01 00:00:00', NULL, 'Especialista');
+
+-- Adicionando dados para a tabela TELEFONE
+INSERT INTO TELEFONE (id_pessoa, num_telefone)
+VALUES
+(1, '+5583988881111'),
+(2, '+5583981982019'),
+(2, '+558332222019'),
+(3, '+5583981981981'),
+(4, '+5583988885656'),
+(5, '+5583940404040'),
+(6, '+5583988886666'),
+(7, '+5583988887777'),
+(8, '+5583988888888'),
+(9, '+5583988889999'),
+(10, '+5583999990000'),
+(11, '+5583999991111'),
+(11, '+558333331111'),
+(12, '+5583999992222'),
+(13, '+5583999993333'),
+(14, '+5583999994444'),
+(15, '+5583999995555'),
+(16, '+5583999996666'),
+(17, '+5583999997777'),
+(18, '+5583999998888'),
+(18, '+558333338888');
+
+
+INSERT INTO ALERGIA (id_alergia, nome_alergia)
+VALUES
+(1, 'Vasco da Gama'),
+(2, 'Gato'),
+(3, 'Frutos do Mar'),
+(4, 'Amendoim'),
+(5, 'Cachorro'),
+(6, 'Kairouseki'),
+(7, 'Ficar sem Carne'),
+(8, 'L');
+
+INSERT INTO ALERGIA_PACIENTE (id_pessoa, id_alergia)
+VALUES
+-- João Silva
+(1, 1), -- Vasco da Gama
+(1, 3), -- Frutos do Mar
+
+-- Gabriel Barbosa (Gabigol)
+(2, 1), -- Vasco da Gama
+
+-- Arthur Antunes Coimbra (Zico)
+(3, 1), -- Vasco da Gama
+
+-- Monkey D. Luffy
+(4, 1), -- Vasco da Gama
+(4, 6), -- Kairouseki
+(4, 7), -- Ficar sem Carne
+
+-- Light Yagami
+(5, 5), -- Cachorro
+(5, 8), -- L
+
+-- Carlos Eduardo
+(16, 1), -- Vasco da Gama
+(16, 4), -- Amendoim
+
+-- Marina Silva
+(17, 1), -- Vasco da Gama
+(17, 2), -- Gato
+
+-- Fernando Souza
+(18, 1), -- Vasco da Gama
+(18, 4); -- Amendoim
