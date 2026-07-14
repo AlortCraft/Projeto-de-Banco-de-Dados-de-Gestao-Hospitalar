@@ -9,6 +9,17 @@ WHERE
     AND r.id_pessoa = 9 AND r.dt_fim IS NULL
     AND pr.id_pessoa = 14 AND pr.dt_fim IS NULL;
 
+-- Verificação: confere o atendimento recém-inserido
+SELECT * FROM ATENDIMENTO WHERE id_atendimento = 13;
+
+
+-- O atendimento 13 é criado acima, então seus procedimentos precisam ser inseridos aqui.
+INSERT INTO ATENDIMENTO_PROCEDIMENTO
+    (id_atendimento, id_procedimento, qtd_executada, tempo_real_gasto, observacao_intercorrencias, is_faturado)
+VALUES
+    (13, 1, 1, 14, 'Coleta de sangue de rotina', FALSE),
+    (13, 3, 2, 18, 'Duas doses de medicação aplicadas', TRUE);
+
 
 
 -- Listar todos os atendimentos de um paciente específico (ordenados por data)
@@ -17,29 +28,32 @@ FROM ATENDIMENTO a
 WHERE a.id_paciente = 5
 ORDER BY a.data_hora ASC;
 
--- Listar os procedimentos realizados em um atendimento (com nome do procedimento, quantidade e tempo real)
-SELECT pro.nome, a_pro.qtd_executada, a_pro.tempo_real_gasto
+-- Listar os procedimentos realizados em um atendimento.
+SELECT a_pro.id_atendimento, pro.nome, a_pro.qtd_executada, a_pro.tempo_real_gasto, a_pro.is_faturado
 FROM PROCEDIMENTO pro, ATENDIMENTO_PROCEDIMENTO a_pro
-WHERE pro.id_procedimento = a_pro.id_procedimento AND a_pro.id_atendimento = 13;
+WHERE pro.id_procedimento = a_pro.id_procedimento AND id_atendimento = 3
+ORDER BY a_pro.id_atendimento, pro.nome;
 
--- Atualizar os dados de um paciente (Como nosso modelo não tem endereço, atualizamos o convênio)
--- Vamos atualizar o convênio do paciente de ID = 5 (Light Yagami) para 'KIRA-999'
+-- Atualizar os dados de um paciente (atualizando o convênio)
 UPDATE PACIENTE
 SET num_convenio = 'KIRA-999'
 WHERE id_pessoa = 5;
 
 
--- Remover um procedimento realizado (apenas se ainda não houver faturamento associado – usando a flag is_faturado)
--- Tenta deletar o procedimento do atendimento apenas se a flag 'is_faturado' for FALSE. 
--- Se já estiver faturado (TRUE), o banco não apagará nada (0 linhas afetadas).
+-- Remover um procedimento realizado (não faturado) (Coleta de sangue do atendimento 13 criado acima)
 DELETE FROM ATENDIMENTO_PROCEDIMENTO
-WHERE id_atendimento = 13 
-  AND id_procedimento = 1 
+WHERE id_atendimento = 13
+  AND id_procedimento = 1
+  AND is_faturado = FALSE;
+
+-- CASO BLOQUEADO: procedimento 1 do atendimento 3 JÁ está faturado,
+DELETE FROM ATENDIMENTO_PROCEDIMENTO
+WHERE id_atendimento = 3
+  AND id_procedimento = 1
   AND is_faturado = FALSE;
 
 
 -- Calcular o tempo médio de duração dos atendimentos por residente
--- Agrupa os atendimentos pelo ID e Nome do residente, calculando a média de duração
 SELECT pes.nome AS nome_residente, ROUND(AVG(a.duracao_minutos), 2) AS media_duracao_minutos
 FROM ATENDIMENTO a, PESSOA pes
 WHERE a.id_residente = pes.id_pessoa
