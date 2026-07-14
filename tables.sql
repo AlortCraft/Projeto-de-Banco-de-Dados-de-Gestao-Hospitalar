@@ -110,8 +110,10 @@ CREATE TABLE PROCEDIMENTO(
     codigo VARCHAR(20) NOT NULL UNIQUE,
     nome VARCHAR(100) NOT NULL,
     tempo_medio_execucao INT,
+    nivel_risco VARCHAR(5) NOT NULL DEFAULT 'BAIXO',
 
-    CONSTRAINT pk_procedimento PRIMARY KEY (id_procedimento)
+    CONSTRAINT pk_procedimento PRIMARY KEY (id_procedimento),
+    CONSTRAINT ck_nivel_risco CHECK (nivel_risco IN ('ALTO', 'MEDIO', 'BAIXO'))
 );
 
 

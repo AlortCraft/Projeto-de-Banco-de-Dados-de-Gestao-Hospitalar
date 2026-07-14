@@ -171,14 +171,14 @@ VALUES
 
 -- Adicionando dados para a tabela PROCEDIMENTO
 -- Cada procedimento possui código, nome e tempo médio de execução em minutos.
-INSERT INTO PROCEDIMENTO (id_procedimento, codigo, nome, tempo_medio_execucao)
+INSERT INTO PROCEDIMENTO (id_procedimento, codigo, nome, tempo_medio_execucao, nivel_risco)
 VALUES
-(1, 'PROC-001', 'Coleta de Sangue', 15),
-(2, 'PROC-002', 'Sutura Simples (Costura)', 30),
-(3, 'PROC-003', 'Aplicação de Medicação IV', 10),
-(4, 'PROC-004', 'Ressonância Magnética (Alto Risco)', 45),
-(5, 'PROC-005', 'Drenagem de Abscesso', 25),
-(6, 'PROC-006', 'Intubação Orotraqueal (Alto Risco)', 20);
+(1, 'PROC-001', 'Coleta de Sangue', 15, 'BAIXO'),
+(2, 'PROC-002', 'Sutura Simples (Costura)', 30, 'MEDIO'),
+(3, 'PROC-003', 'Aplicação de Medicação IV', 10, 'BAIXO'),
+(4, 'PROC-004', 'Ressonância Magnética (Alto Risco)', 45, 'ALTO'),
+(5, 'PROC-005', 'Drenagem de Abscesso', 25, 'MEDIO'),
+(6, 'PROC-006', 'Intubação Orotraqueal (Alto Risco)', 20, 'ALTO');
 
 
 -- Adicionando dados para a tabela ATENDIMENTO
