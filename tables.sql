@@ -28,14 +28,16 @@ CREATE TABLE PACIENTE (
     num_convenio VARCHAR(20) NOT NULL,
     grupo_sanguineo VARCHAR(3) NOT NULL,
     
-    -- Essas flags fixas servem para o SGBD validar rigidamente a herança via FK
+    -- Esta flag garante que a linha é de um paciente;
+    -- a outra flag é usada apenas para alinhar a FK com a tabela PESSOA.
     is_paciente_flag BOOLEAN NOT NULL DEFAULT TRUE CHECK (is_paciente_flag = TRUE),
-    is_profissional_flag BOOLEAN NOT NULL DEFAULT FALSE CHECK (is_profissional_flag = FALSE),
+    is_profissional_flag BOOLEAN NOT NULL,
     
     CONSTRAINT PK_PACIENTE PRIMARY KEY (id_pessoa),
     CONSTRAINT UN_PACIENTE_CONVENIO UNIQUE (num_convenio),
     
-    -- A mágica acontece aqui: A FK valida o ID E garante que a pessoa foi criada como PACIENTE na tabela mãe
+    -- A FK valida o ID e garante que a pessoa existe como paciente na tabela mãe.
+    -- Se o paciente também for profissional, isso continua sendo válido.
     CONSTRAINT FK_PACIENTE_PESSOA FOREIGN KEY (id_pessoa, is_paciente_flag, is_profissional_flag) 
         REFERENCES PESSOA(id_pessoa, is_paciente, is_profissional) ON DELETE CASCADE
 );
@@ -47,13 +49,14 @@ CREATE TABLE PROFISSIONAL (
     dt_admissao TIMESTAMP NOT NULL,
     especialidade VARCHAR(100) NOT NULL,
     
-    is_paciente_flag BOOLEAN NOT NULL DEFAULT FALSE CHECK (is_paciente_flag = FALSE),
+    is_paciente_flag BOOLEAN NOT NULL,
     is_profissional_flag BOOLEAN NOT NULL DEFAULT TRUE CHECK (is_profissional_flag = TRUE),
     
     CONSTRAINT PK_PROFISSIONAL PRIMARY KEY (id_pessoa),
     CONSTRAINT UN_PROFISSIONAL_CRM UNIQUE (crm),
     
-    -- Garante que a pessoa foi criada como PROFISSIONAL na tabela mãe
+    -- A FK valida o ID e garante que a pessoa existe como profissional na tabela mãe.
+    -- Se o profissional também for paciente, isso continua sendo válido.
     CONSTRAINT FK_PROFISSIONAL_PESSOA FOREIGN KEY (id_pessoa, is_paciente_flag, is_profissional_flag) 
         REFERENCES PESSOA(id_pessoa, is_paciente, is_profissional) ON DELETE CASCADE
 );
@@ -237,3 +240,4 @@ CREATE TABLE ESCALA_PLANTAO (
     CONSTRAINT CK_ESCALA_TURNO CHECK (turno IN ('MANHA', 'TARDE', 'NOITE')),
     CONSTRAINT CK_ESCALA_PAPEIS CHECK (id_residente <> id_preceptor)
 );
+
