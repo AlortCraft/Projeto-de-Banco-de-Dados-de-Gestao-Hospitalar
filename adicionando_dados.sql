@@ -155,3 +155,77 @@ VALUES
 -- Fernando Souza
 (18, 1), -- Vasco da Gama
 (18, 4); -- Amendoim
+
+-- =========================================================================
+-- INSERÇÃO DOS DADOS FALTANTES PARA COMPLETAR OS REQUISITOS DA ETAPA 1
+-- =========================================================================
+
+-- Adicionando dados para a tabela UNIDADE
+INSERT INTO UNIDADE (id_unidade, nome)
+VALUES
+(1, 'AMBULATORIO'),
+(2, 'UTI'),
+(3, 'PRONTO-SOCORRO'),
+(4, 'Enfermaria');
+
+
+-- Adicionando dados para a tabela PROCEDIMENTO
+-- Cada procedimento possui código, nome e tempo médio de execução em minutos.
+INSERT INTO PROCEDIMENTO (id_procedimento, codigo, nome, tempo_medio_execucao)
+VALUES
+(1, 'PROC-001', 'Coleta de Sangue', 15),
+(2, 'PROC-002', 'Sutura Simples (Costura)', 30),
+(3, 'PROC-003', 'Aplicação de Medicação IV', 10),
+(4, 'PROC-004', 'Ressonância Magnética (Alto Risco)', 45),
+(5, 'PROC-005', 'Drenagem de Abscesso', 25),
+(6, 'PROC-006', 'Intubação Orotraqueal (Alto Risco)', 20);
+
+
+-- Adicionando dados para a tabela ATENDIMENTO
+-- Os atendimentos ligam Pacientes, Residentes e Preceptores que os supervisionaram
+INSERT INTO ATENDIMENTO (id_atendimento, data_hora, duracao_minutos, id_paciente, id_residente, dt_inicio_residente, id_preceptor, dt_inicio_preceptor)
+VALUES
+(1, '2026-07-01 10:00:00', 45, 1, 6, '2026-03-01 00:00:00', 11, '2015-01-01 00:00:00'),
+(2, '2026-07-01 11:30:00', 30, 2, 7, '2026-03-01 00:00:00', 12, '2018-02-10 00:00:00'),
+(3, '2026-07-02 09:00:00', 60, 3, 8, '2026-03-01 00:00:00', 13, '2014-06-01 00:00:00'),
+(4, '2026-07-02 14:00:00', 20, 4, 9, '2026-03-01 00:00:00', 14, '2020-01-15 00:00:00'),
+(5, '2026-07-03 08:30:00', 40, 5, 10, '2026-03-01 00:00:00', 15, '2010-03-20 00:00:00'),
+(6, '2026-07-03 16:00:00', 50, 16, 17, '2026-03-01 00:00:00', 16, '2015-02-01 00:00:00'),
+(7, '2026-07-04 10:30:00', 35, 17, 6, '2026-03-01 00:00:00', 11, '2015-01-01 00:00:00'),
+(8, '2026-07-04 11:00:00', 25, 18, 7, '2026-03-01 00:00:00', 12, '2018-02-10 00:00:00'),
+(9, '2026-07-05 15:00:00', 90, 1, 8, '2026-03-01 00:00:00', 13, '2014-06-01 00:00:00'),
+(10, '2026-07-05 17:30:00', 15, 2, 9, '2026-03-01 00:00:00', 14, '2020-01-15 00:00:00'),
+(11, '2026-07-06 09:15:00', 55, 3, 10, '2026-03-01 00:00:00', 15, '2010-03-20 00:00:00'),
+(12, '2026-07-06 14:45:00', 30, 4, 17, '2026-03-01 00:00:00', 16, '2015-02-01 00:00:00');
+
+
+-- Adicionando dados para a tabela ATENDIMENTO_PROCEDIMENTO
+-- Registra quais procedimentos foram executados em quais atendimentos.
+INSERT INTO ATENDIMENTO_PROCEDIMENTO (id_atendimento, id_procedimento, qtd_executada, tempo_real_gasto, observacao_intercorrencias, is_faturado)
+VALUES
+(1, 1, 1, 12, 'Coleta rápida, sem intercorrências', FALSE),
+(1, 2, 1, 35, 'Paciente nervoso, demorou mais que o previsto', FALSE),
+(2, 3, 2, 15, 'Duas doses aplicadas com intervalo de 10 min', FALSE),
+(3, 1, 1, 10, NULL, TRUE), -- Já faturado (não pode ser excluído)
+(3, 5, 1, 30, 'Procedimento cirúrgico padrão realizado com sucesso', FALSE),
+(4, 3, 1, 8, NULL, FALSE),
+(5, 1, 2, 20, NULL, FALSE),
+(6, 4, 1, 50, 'Procedimento de Alto Risco. Paciente estável', FALSE), -- Procedimento ALTO RISCO (id_procedimento = 4)
+(7, 2, 1, 25, NULL, FALSE),
+(8, 1, 1, 15, NULL, FALSE),
+(9, 6, 1, 25, 'Procedimento de Alto Risco em caráter emergencial', FALSE), -- Procedimento ALTO RISCO (id_procedimento = 6)
+(10, 3, 1, 10, NULL, FALSE);
+
+
+-- Adicionando dados para a tabela ESCALA_PLANTAO
+-- Registra as escalas de plantão de cada residente e supervisor por unidade
+INSERT INTO ESCALA_PLANTAO (id_escala, dia_semana, turno, id_unidade, id_residente, dt_inicio_residente, id_preceptor, dt_inicio_preceptor)
+VALUES
+(1, 'SEGUNDA', 'MANHA', 1, 6, '2026-03-01 00:00:00', 11, '2015-01-01 00:00:00'),
+(2, 'SEGUNDA', 'TARDE', 1, 7, '2026-03-01 00:00:00', 12, '2018-02-10 00:00:00'),
+(3, 'TERCA', 'NOITE', 2, 8, '2026-03-01 00:00:00', 13, '2014-06-01 00:00:00'),
+(4, 'QUARTA', 'MANHA', 3, 9, '2026-03-01 00:00:00', 14, '2020-01-15 00:00:00'),
+(5, 'QUINTA', 'TARDE', 4, 10, '2026-03-01 00:00:00', 15, '2010-03-20 00:00:00'),
+(6, 'SEXTA', 'NOITE', 2, 17, '2026-03-01 00:00:00', 16, '2015-02-01 00:00:00'),
+(7, 'SABADO', 'MANHA', 3, 6, '2026-03-01 00:00:00', 11, '2015-01-01 00:00:00'),
+(8, 'DOMINGO', 'NOITE', 2, 7, '2026-03-01 00:00:00', 12, '2018-02-10 00:00:00');
