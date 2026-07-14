@@ -2,7 +2,7 @@
 -- Inserir um novo atendimento (verificando se paciente, residente, preceptor existem)
 INSERT INTO ATENDIMENTO(id_atendimento, data_hora, duracao_minutos, id_paciente,
     id_residente, dt_inicio_residente, id_preceptor, dt_inicio_preceptor)
-SELECT 13, '2026-07-07 08:30:00', 45, p.id_pessoa, r.id_pessoa, r.dt_inicio, pr.id_pessoa, pr.dt_inicio
+SELECT 17, '2026-07-07 08:30:00', 45, p.id_pessoa, r.id_pessoa, r.dt_inicio, pr.id_pessoa, pr.dt_inicio
 FROM PACIENTE p, RESIDENTE r, PRECEPTOR pr
 WHERE 
     p.id_pessoa = 5
@@ -10,15 +10,15 @@ WHERE
     AND pr.id_pessoa = 14 AND pr.dt_fim IS NULL;
 
 -- Verificação: confere o atendimento recém-inserido
-SELECT * FROM ATENDIMENTO WHERE id_atendimento = 13;
+SELECT * FROM ATENDIMENTO WHERE id_atendimento = 17;
 
 
--- O atendimento 13 é criado acima, então seus procedimentos precisam ser inseridos aqui.
+-- O atendimento 17 é criado acima, então seus procedimentos precisam ser inseridos aqui.
 INSERT INTO ATENDIMENTO_PROCEDIMENTO
     (id_atendimento, id_procedimento, qtd_executada, tempo_real_gasto, observacao_intercorrencias, is_faturado)
 VALUES
-    (13, 1, 1, 14, 'Coleta de sangue de rotina', FALSE),
-    (13, 3, 2, 18, 'Duas doses de medicação aplicadas', TRUE);
+    (17, 1, 1, 14, 'Coleta de sangue de rotina', FALSE),
+    (17, 3, 2, 18, 'Duas doses de medicação aplicadas', TRUE);
 
 
 
@@ -40,9 +40,9 @@ SET num_convenio = 'KIRA-999'
 WHERE id_pessoa = 5;
 
 
--- Remover um procedimento realizado (não faturado) (Coleta de sangue do atendimento 13 criado acima)
+-- Remover um procedimento realizado (não faturado) (Coleta de sangue do atendimento 17 criado acima)
 DELETE FROM ATENDIMENTO_PROCEDIMENTO
-WHERE id_atendimento = 13
+WHERE id_atendimento = 17
   AND id_procedimento = 1
   AND is_faturado = FALSE;
 
