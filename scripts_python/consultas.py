@@ -10,7 +10,10 @@ import psycopg2
 
 from sgbd import DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD
 
-ARQUIVOS_CONSULTAS = ["scripts_SQL/CRUD_Consultas.sql", "scripts_SQL/consultas_analiticas.sql"]
+ARQUIVOS_CONSULTAS = [
+    "scripts_SQL/CRUD_Consultas.sql",
+    "scripts_SQL/consultas_analiticas.sql",
+]
 
 
 def separar_comandos(sql):
@@ -45,20 +48,22 @@ def main():
         )
         cursor = conn.cursor()
     
-        with open(ARQUIVOS_CONSULTAS[0], "r", encoding="utf-8") as arquivo:
-            sql = arquivo.read()
+        for arquivo_sql in ARQUIVOS_CONSULTAS:
+            print(f"\n===== {arquivo_sql} =====")
+            with open(arquivo_sql, "r", encoding="utf-8") as arquivo:
+                sql = arquivo.read()
 
-        for numero, comando in enumerate(separar_comandos(sql), 1):
-            titulo = comando.splitlines()[0]
-            print(f"\n[{numero}] {titulo}")
-            cursor.execute(comando)
-            if cursor.description is not None:  # é um SELECT
-                imprimir_resultado(cursor)
-            else:  # INSERT / UPDATE / DELETE
-                print(f"   OK ({cursor.rowcount} linha(s) afetada(s))")
+            for numero, comando in enumerate(separar_comandos(sql), 1):
+                titulo = comando.splitlines()[0]
+                print(f"\n[{numero}] {titulo}")
+                cursor.execute(comando)
+                if cursor.description is not None:  # é um SELECT
+                    imprimir_resultado(cursor)
+                else:  # INSERT / UPDATE / DELETE
+                    print(f"   OK ({cursor.rowcount} linha(s) afetada(s))")
 
         conn.commit()
-        print("\nConsultas com sucesso!")
+        print("\nConsultas Finalizadas.")
     except Exception as erro:
         print(f"Erro {erro}")
         if conn is not None:

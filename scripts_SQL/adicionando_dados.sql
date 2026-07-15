@@ -197,17 +197,12 @@ VALUES
 (10, '2026-07-05 17:30:00', 15, 2, 9, '2026-03-01 00:00:00', 14, '2020-01-15 00:00:00'),
 (11, '2026-07-06 09:15:00', 55, 3, 10, '2026-03-01 00:00:00', 15, '2010-03-20 00:00:00'),
 (12, '2026-07-06 14:45:00', 30, 4, 17, '2026-03-01 00:00:00', 16, '2015-02-01 00:00:00'),
-
--- Atendimentos extras supervisionados pelo preceptor 11 (Roberto Carlos) em julho/2026.
--- Com estes, o preceptor 11 passa a ter 6 atendimentos no mês (atend. 1, 7, 13, 14, 15, 16),
--- viabilizando a consulta analítica "preceptores com mais de 5 atendimentos no mês".
 (13, '2026-07-08 09:00:00', 30, 2, 6, '2026-03-01 00:00:00', 11, '2015-01-01 00:00:00'),
 (14, '2026-07-09 10:00:00', 40, 3, 6, '2026-03-01 00:00:00', 11, '2015-01-01 00:00:00'),
 (15, '2026-07-10 11:00:00', 25, 4, 7, '2026-03-01 00:00:00', 11, '2015-01-01 00:00:00'),
 (16, '2026-07-11 14:00:00', 50, 1, 8, '2026-03-01 00:00:00', 11, '2015-01-01 00:00:00');
 
 
--- Adicionando dados para a tabela ATENDIMENTO_PROCEDIMENTO
 -- Registra quais procedimentos foram executados em quais atendimentos.
 INSERT INTO ATENDIMENTO_PROCEDIMENTO (id_atendimento, id_procedimento, qtd_executada, tempo_real_gasto, observacao_intercorrencias, is_faturado)
 VALUES
@@ -225,7 +220,6 @@ VALUES
 (10, 3, 1, 10, NULL, FALSE);
 
 
--- Adicionando dados para a tabela ESCALA_PLANTAO
 -- Registra as escalas de plantão de cada residente e supervisor por unidade
 INSERT INTO ESCALA_PLANTAO (id_escala, dia_semana, turno, id_unidade, id_residente, dt_inicio_residente, id_preceptor, dt_inicio_preceptor)
 VALUES
@@ -237,9 +231,5 @@ VALUES
 (6, 'SEXTA', 'NOITE', 2, 17, '2026-03-01 00:00:00', 16, '2015-02-01 00:00:00'),
 (7, 'SABADO', 'MANHA', 3, 6, '2026-03-01 00:00:00', 11, '2015-01-01 00:00:00'),
 (8, 'DOMINGO', 'NOITE', 2, 7, '2026-03-01 00:00:00', 12, '2018-02-10 00:00:00'),
-
--- Segundos plantões na MESMA unidade (dia/turno diferentes), para que a consulta
--- "plantões por unidade e residente" mostre contagem maior que 1.
--- Residente 6 ganha 2º plantão no AMBULATORIO (unidade 1); residente 8, 2º na UTI (unidade 2).
 (9,  'QUARTA', 'TARDE', 1, 6, '2026-03-01 00:00:00', 11, '2015-01-01 00:00:00'),
 (10, 'QUINTA', 'MANHA', 2, 8, '2026-03-01 00:00:00', 13, '2014-06-01 00:00:00');
