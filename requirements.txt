@@ -1,2 +1,6 @@
+# Driver do PostgreSQL (usado por sgbd.py e consultas.py)
 psycopg2-binary
+
+# Interface web (interface.py)
 streamlit
+pandas
