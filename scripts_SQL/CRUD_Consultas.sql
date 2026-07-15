@@ -1,8 +1,8 @@
 
 -- Inserir um novo atendimento (verificando se paciente, residente, preceptor existem)
-INSERT INTO ATENDIMENTO(id_atendimento, data_hora, duracao_minutos, id_paciente,
+INSERT INTO ATENDIMENTO(data_hora, duracao_minutos, id_paciente,
     id_residente, dt_inicio_residente, id_preceptor, dt_inicio_preceptor)
-SELECT 17, '2026-07-07 08:30:00', 45, p.id_pessoa, r.id_pessoa, r.dt_inicio, pr.id_pessoa, pr.dt_inicio
+SELECT '2026-07-07 08:30:00', 45, p.id_pessoa, r.id_pessoa, r.dt_inicio, pr.id_pessoa, pr.dt_inicio
 FROM PACIENTE p, RESIDENTE r, PRECEPTOR pr
 WHERE 
     p.id_pessoa = 5
@@ -10,15 +10,34 @@ WHERE
     AND pr.id_pessoa = 14 AND pr.dt_fim IS NULL;
 
 -- Verificação: confere o atendimento recém-inserido
-SELECT * FROM ATENDIMENTO WHERE id_atendimento = 17;
+SELECT * FROM ATENDIMENTO
+WHERE id_paciente = 5
+  AND id_residente = 9
+  AND id_preceptor = 14
+  AND data_hora = '2026-07-07 08:30:00';
 
 
 -- O atendimento 17 é criado acima, então seus procedimentos precisam ser inseridos aqui.
 INSERT INTO ATENDIMENTO_PROCEDIMENTO
     (id_atendimento, id_procedimento, qtd_executada, tempo_real_gasto, observacao_intercorrencias, is_faturado)
-VALUES
-    (17, 1, 1, 14, 'Coleta de sangue de rotina', FALSE),
-    (17, 3, 2, 18, 'Duas doses de medicação aplicadas', TRUE);
+
+    SELECT 
+        id_atendimento, 1, 1, 14, 'Coleta de sangue de rotina', FALSE
+    FROM ATENDIMENTO
+    WHERE id_paciente = 5 
+    AND id_residente = 9 
+    AND id_preceptor = 14 
+    AND data_hora = '2026-07-07 08:30:00'
+
+    UNION ALL
+
+    SELECT 
+        id_atendimento, 3, 2, 18, 'Duas doses de medicação aplicadas', TRUE
+    FROM ATENDIMENTO
+    WHERE id_paciente = 5 
+    AND id_residente = 9 
+    AND id_preceptor = 14 
+    AND data_hora = '2026-07-07 08:30:00';
 
 
 
@@ -42,7 +61,14 @@ WHERE id_pessoa = 5;
 
 -- Remover um procedimento realizado (não faturado) (Coleta de sangue do atendimento 17 criado acima)
 DELETE FROM ATENDIMENTO_PROCEDIMENTO
-WHERE id_atendimento = 17
+WHERE id_atendimento = (
+    SELECT id_atendimento
+    FROM ATENDIMENTO
+    WHERE id_paciente = 5 
+    AND id_residente = 9 
+    AND id_preceptor = 14 
+    AND data_hora = '2026-07-07 08:30:00' 
+    )
   AND id_procedimento = 1
   AND is_faturado = FALSE;
 

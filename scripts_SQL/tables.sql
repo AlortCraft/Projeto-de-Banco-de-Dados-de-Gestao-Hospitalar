@@ -93,7 +93,7 @@ CREATE TABLE PRECEPTOR (
 
 -- TABELA UNIDADE:
 CREATE TABLE UNIDADE(
-    id_unidade INT,
+    id_unidade SERIAL,
     nome VARCHAR(14), -- Faltava uma vírgula.
 
     CONSTRAINT pk_unidade PRIMARY KEY (id_unidade),
@@ -102,7 +102,7 @@ CREATE TABLE UNIDADE(
 
 -- TABELA PROCEDIMENTO:
 CREATE TABLE PROCEDIMENTO(
-    id_procedimento INT,
+    id_procedimento SERIAL,
     codigo VARCHAR(20) NOT NULL UNIQUE,
     nome VARCHAR(100) NOT NULL,
     tempo_medio_execucao INT,
