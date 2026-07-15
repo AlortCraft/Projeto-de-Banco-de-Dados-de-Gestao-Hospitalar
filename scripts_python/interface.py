@@ -30,7 +30,7 @@ except Exception as e:
 
 # Interface Principal (Menu Lateral)
 st.sidebar.title("🏥 Gestão Hospitalar")
-menu = ["Visualizar Tabelas", "Executar Consultas", "RESETAR DATABASE"]
+menu = ["Visualizar Tabelas", "Executar CRUDs e Consultas Básicas", "Executar Consultas Analíticas", "RESETAR DATABASE"]
 escolha = st.sidebar.radio("Navegação:", menu)
 
 # Tela 1: Visualizar as Tabelas Livres
@@ -50,12 +50,12 @@ if escolha == "Visualizar Tabelas":
             st.error(f"Erro ao carregar a tabela: {e}")
 
 # Tela 2: Rodar o script CRUD_Consultas.sql dinamicamente
-elif escolha == "Executar Consultas":
+elif escolha == "Executar CRUDs e Consultas Básicas":
     st.header("📝 Executar Consultas Predefinidas")
 
     try:
         # Lê o arquivo usando a sua constante
-        with open(ARQUIVOS_CONSULTAS, "r", encoding="utf-8") as arquivo:
+        with open(ARQUIVOS_CONSULTAS[0], "r", encoding="utf-8") as arquivo:
             sql = arquivo.read()
         
         comandos = separar_comandos(sql)
@@ -93,7 +93,54 @@ elif escolha == "Executar Consultas":
     except FileNotFoundError:
         st.warning(f"Arquivo '{ARQUIVOS_CONSULTAS}' não encontrado.")
 
-# Tela 3: Resetar o banco de dados via UI
+
+# Tela 3: Rodar o script consultas_analiticas.sql dinamicamente
+elif escolha == "Executar Consultas Analíticas":
+    st.header("📝 Executar Consultas Predefinidas")
+
+    try:
+        # Lê o arquivo usando a sua constante
+        with open(ARQUIVOS_CONSULTAS[1], "r", encoding="utf-8") as arquivo:
+            sql = arquivo.read()
+        
+        comandos = separar_comandos(sql)
+
+        opcoes_comandos = {}
+        for i, cmd in enumerate(comandos, 1):
+            titulo = cmd.splitlines()[0] # Pega o comentário
+            opcoes_comandos[f"[{i}] {titulo}"] = cmd
+
+        selecao = st.selectbox("Escolha uma consulta para rodar:", list(opcoes_comandos.keys()))
+        comando_sql = opcoes_comandos[selecao]
+
+        # Mostra o código SQL na tela para o usuário ver o que vai rodar
+        st.code(comando_sql, language="sql")
+
+        if st.button("Executar Script"):
+            try:
+                cursor = conn.cursor()
+                cursor.execute(comando_sql)
+
+                if cursor.description is not None:  # É um SELECT
+                    colunas = [desc[0] for desc in cursor.description]
+                    dados = cursor.fetchall()
+                    df = pd.DataFrame(dados, columns=colunas)
+                    
+                    st.dataframe(df, use_container_width=True)
+                    st.success(f"Consulta retornou {len(df)} linha(s).")
+                else:  # É um INSERT / UPDATE / DELETE
+                    conn.commit()
+                    st.success(f"Sucesso! {cursor.rowcount} linha(s) afetada(s).")
+            except Exception as e:
+                conn.rollback() # Essencial para não travar o banco em caso de erro no SQL
+                st.error(f"Erro na transação: {e}")
+
+    except FileNotFoundError:
+        st.warning(f"Arquivo '{ARQUIVOS_CONSULTAS}' não encontrado.")
+
+
+
+# Tela 4: Resetar o banco de dados via UI
 elif escolha == "RESETAR DATABASE":
     st.header("⚠️ Administração")
     st.write("Aqui você pode recriar o banco de dados do zero (Drop, Create e Insert).")
