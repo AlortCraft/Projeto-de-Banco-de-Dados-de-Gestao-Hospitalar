@@ -16,7 +16,7 @@ FROM PESSOA p
 INNER JOIN ATENDIMENTO a
 ON a.id_preceptor = p.id_pessoa
 WHERE EXTRACT(MONTH FROM a.data_hora) = 7 -- Julho
-    AND EXTRACT(YEAR FROM a.data_hora) = 2026 -- ano 2026
+    AND EXTRACT(YEAR FROM a.data_hora) = 2026
 GROUP BY p.nome
 HAVING COUNT(a.id_preceptor) > 5
 ORDER BY quantidade_atendimentos DESC;

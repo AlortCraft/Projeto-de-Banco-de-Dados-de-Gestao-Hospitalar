@@ -21,8 +21,7 @@ WHERE id_paciente = 5
 INSERT INTO ATENDIMENTO_PROCEDIMENTO
     (id_atendimento, id_procedimento, qtd_executada, tempo_real_gasto, observacao_intercorrencias, is_faturado)
 
-    SELECT 
-        id_atendimento, 1, 1, 14, 'Coleta de sangue de rotina', FALSE
+    SELECT id_atendimento, 1, 1, 14, 'Coleta de sangue de rotina', FALSE
     FROM ATENDIMENTO
     WHERE id_paciente = 5 
     AND id_residente = 9 
@@ -31,8 +30,7 @@ INSERT INTO ATENDIMENTO_PROCEDIMENTO
 
     UNION ALL
 
-    SELECT 
-        id_atendimento, 3, 2, 18, 'Duas doses de medicação aplicadas', TRUE
+    SELECT id_atendimento, 3, 2, 18, 'Duas doses de medicação aplicadas', TRUE
     FROM ATENDIMENTO
     WHERE id_paciente = 5 
     AND id_residente = 9 
