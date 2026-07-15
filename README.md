@@ -106,3 +106,24 @@ Observações:
 - As consultas analíticas rodam **depois** das operações de CRUD, então seus números já
   refletem o atendimento inserido pelo CRUD.
 
+### 7. Interface web (Streamlit)
+
+Além dos scripts de linha de comando, há uma interface gráfica em Streamlit
+(`scripts_python/interface.py`) que permite, pelo navegador:
+
+- **Visualizar Tabelas** — escolher uma tabela e ver seu conteúdo;
+- **Executar CRUDs e Consultas Básicas** — rodar, uma a uma, as consultas do `CRUD_Consultas.sql`;
+- **Executar Consultas Analíticas** — rodar as 4 consultas do `consultas_analiticas.sql`;
+- **RESETAR DATABASE** — recriar e popular o banco do zero (DROP + CREATE + INSERT).
+
+A interface depende do `streamlit` e do `pandas` (já incluídos no `requirements.txt`) e usa
+as mesmas credenciais definidas no `sgbd.py`. Rode a partir da raiz do projeto:
+```bash
+streamlit run scripts_python/interface.py
+```
+A aplicação abre no navegador (por padrão em <http://localhost:8501>).
+
+> **Observação:** na tela "CRUDs e Consultas Básicas", os comandos formam uma sequência —
+> execute-os na ordem em que aparecem (ex.: inserir o atendimento antes de registrar os
+> procedimentos dele), senão alguns comandos falham por dependência de dados.
+
