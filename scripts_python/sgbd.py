@@ -16,8 +16,8 @@ DB_USER = "hospital"
 DB_PASSWORD = "hospital"
 
 # Arquivos SQL
-ARQUIVO_TABELAS = "tables.sql"
-ARQUIVO_DADOS = "adicionando_dados.sql"
+ARQUIVO_TABELAS = "scripts_SQL/tables.sql"
+ARQUIVO_DADOS = "scripts_SQL/adicionando_dados.sql"
 
 # Todas as tabelas, para o DROP.
 TABELAS = [

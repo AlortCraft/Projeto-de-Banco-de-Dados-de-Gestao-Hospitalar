@@ -10,7 +10,7 @@ import psycopg2
 
 from sgbd import DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD
 
-ARQUIVO_CONSULTAS = "CRUD_Consultas.sql"
+ARQUIVOS_CONSULTAS = "scripts_SQL/CRUD_Consultas.sql"
 
 
 def separar_comandos(sql):
@@ -44,8 +44,8 @@ def main():
             password=DB_PASSWORD,
         )
         cursor = conn.cursor()
-
-        with open(ARQUIVO_CONSULTAS, "r", encoding="utf-8") as arquivo:
+    
+        with open(ARQUIVOS_CONSULTAS, "r", encoding="utf-8") as arquivo:
             sql = arquivo.read()
 
         for numero, comando in enumerate(separar_comandos(sql), 1):
