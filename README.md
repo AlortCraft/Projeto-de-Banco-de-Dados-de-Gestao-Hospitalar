@@ -12,9 +12,15 @@ O hospital possui Unidades (Enfermaria, UTI, Pronto-Socorro, Ambulatório). Os r
 
 ## Como executar o SGBD
 
-O script `sgbd.py` conecta ao PostgreSQL, cria as tabelas (`tables.sql`) e insere os
-dados (`adicionando_dados.sql`). Ele apaga (DROP) as tabelas antes de recriá-las, então
-pode ser executado quantas vezes forem necessárias — sempre partindo do zero.
+Os scripts Python ficam em `scripts_python/` e os arquivos SQL em `scripts_SQL/`.
+O script `scripts_python/sgbd.py` conecta ao PostgreSQL, cria as tabelas
+(`scripts_SQL/tables.sql`) e insere os dados (`scripts_SQL/adicionando_dados.sql`).
+Ele apaga (DROP) as tabelas antes de recriá-las, então pode ser executado quantas
+vezes forem necessárias — sempre partindo do zero.
+
+> **Importante:** rode os scripts a partir da **raiz do projeto** (ex.:
+> `python scripts_python/sgbd.py`), pois eles abrem os arquivos `.sql` por caminho
+> relativo (`scripts_SQL/...`).
 
 **Pré-requisitos:** Python 3 e PostgreSQL instalados.
 
@@ -62,9 +68,9 @@ python -m venv venv
 pip install -r requirements.txt
 ```
 
-### 4. Conferir as credenciais em `sgbd.py`
+### 4. Conferir as credenciais em `scripts_python/sgbd.py`
 
-No topo do arquivo `sgbd.py`, ajuste as constantes conforme a sua instalação:
+No topo do arquivo `scripts_python/sgbd.py`, ajuste as constantes conforme a sua instalação:
 ```python
 DB_HOST = "localhost"
 DB_PORT = "5432"
@@ -75,21 +81,28 @@ DB_PASSWORD = "hospital"
 
 ### 5. Executar
 
+A partir da raiz do projeto:
 ```bash
-python sgbd.py
+python scripts_python/sgbd.py
 ```
 Se tudo der certo, aparece: `Banco Criado.`
 
-### 6. Executar as consultas (CRUD)
+### 6. Executar as consultas (CRUD + analíticas)
 
-O script `consultas.py` roda os comandos de `CRUD_Consultas.sql` (INSERT, SELECT,
-UPDATE, DELETE e uma consulta de média) e **mostra na tela** o resultado de cada um.
-Ele reutiliza as mesmas credenciais definidas no `sgbd.py`.
+O script `scripts_python/consultas.py` roda, em sequência, os comandos de
+`scripts_SQL/CRUD_Consultas.sql` (INSERT, SELECT, UPDATE, DELETE e uma consulta de
+média) e de `scripts_SQL/consultas_analiticas.sql` (as 4 consultas analíticas: ranking
+de residentes, preceptores com mais de 5 atendimentos no mês, plantões por
+unidade/residente e pacientes sem procedimento de risco 'ALTO'), **mostrando na tela**
+o resultado de cada um. Reutiliza as mesmas credenciais definidas no `sgbd.py`.
 
-Rode **depois** do `sgbd.py` (que cria e popula o banco):
+Rode **depois** do `sgbd.py` (que cria e popula o banco), a partir da raiz do projeto:
 ```bash
-python consultas.py
+python scripts_python/consultas.py
 ```
-Observação: como uma das consultas insere um atendimento fixo, para rodar o
-`consultas.py` novamente basta rodar o `sgbd.py` antes, recriando o banco do zero.
+Observações:
+- Como o CRUD insere um atendimento fixo, para rodar o `consultas.py` novamente basta
+  rodar o `sgbd.py` antes, recriando o banco do zero.
+- As consultas analíticas rodam **depois** das operações de CRUD, então seus números já
+  refletem o atendimento inserido pelo CRUD.
 
