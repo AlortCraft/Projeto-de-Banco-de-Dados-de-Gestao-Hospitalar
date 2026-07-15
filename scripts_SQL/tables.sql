@@ -36,8 +36,6 @@ CREATE TABLE PACIENTE (
     CONSTRAINT PK_PACIENTE PRIMARY KEY (id_pessoa),
     CONSTRAINT UN_PACIENTE_CONVENIO UNIQUE (num_convenio),
     
-    -- A FK valida o ID e garante que a pessoa existe como paciente na tabela mãe.
-    -- Se o paciente também for profissional, isso continua sendo válido.
     CONSTRAINT FK_PACIENTE_PESSOA FOREIGN KEY (id_pessoa, is_paciente_flag, is_profissional_flag) 
         REFERENCES PESSOA(id_pessoa, is_paciente, is_profissional) ON DELETE CASCADE
 );
@@ -55,8 +53,6 @@ CREATE TABLE PROFISSIONAL (
     CONSTRAINT PK_PROFISSIONAL PRIMARY KEY (id_pessoa),
     CONSTRAINT UN_PROFISSIONAL_CRM UNIQUE (crm),
     
-    -- A FK valida o ID e garante que a pessoa existe como profissional na tabela mãe.
-    -- Se o profissional também for paciente, isso continua sendo válido.
     CONSTRAINT FK_PROFISSIONAL_PESSOA FOREIGN KEY (id_pessoa, is_paciente_flag, is_profissional_flag) 
         REFERENCES PESSOA(id_pessoa, is_paciente, is_profissional) ON DELETE CASCADE
 );
@@ -184,14 +180,17 @@ CREATE TABLE ATENDIMENTO (
 
     CONSTRAINT CK_ATENDIMENTO_DURACAO CHECK (duracao_minutos > 0),
 
-    -- Um profissional não pode supervisionar a si mesmo
-    CONSTRAINT CK_ATENDIMENTO_PAPEIS CHECK (id_residente <> id_preceptor)
+    -- Uma mesma pessoa não pode ocupar dois papéis no mesmo atendimento:
+    CONSTRAINT CK_ATENDIMENTO_PAPEIS CHECK (
+        id_residente <> id_preceptor
+        AND id_paciente <> id_residente
+        AND id_paciente <> id_preceptor
+    )
 );
 
 -- TABELA ATENDIMENTO_PROCEDIMENTO (o "procedimento realizado")
 -- A relação entre ATENDIMENTO e PROCEDIMENTO é N:N: um atendimento pode ter vários
--- procedimentos e um procedimento pode ocorrer em vários atendimentos. Por isso cria-se
--- esta tabela com os dois identificadores + os atributos próprios da relação.
+-- procedimentos e um procedimento pode ocorrer em vários atendimentos.
 CREATE TABLE ATENDIMENTO_PROCEDIMENTO (
     id_atendimento INT,
     id_procedimento INT,
@@ -213,8 +212,7 @@ CREATE TABLE ATENDIMENTO_PROCEDIMENTO (
 );
 
 -- TABELA ESCALA_PLANTAO
--- Define o plantão: uma unidade, um dia da semana, um turno, um residente e o preceptor
--- que o supervisiona. As FKs de RESIDENTE e PRECEPTOR também são compostas (histórico).
+-- Define o plantão: uma unidade, um dia da semana, um turno, um residente e o preceptor que o supervisiona..
 CREATE TABLE ESCALA_PLANTAO (
     id_escala SERIAL,
     dia_semana VARCHAR(8) NOT NULL,
